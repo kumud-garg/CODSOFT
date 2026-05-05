@@ -1,0 +1,35 @@
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+
+users = ["User1", "User2", "User3", "User4"]
+items = ["Movie1", "Movie2", "Movie3", "Movie4", "Movie5"]
+
+ratings = np.array([
+    [5, 3, 0, 1, 0],
+    [4, 0, 0, 1, 2],
+    [1, 1, 0, 5, 0],
+    [0, 0, 5, 4, 0]
+])
+
+user_similarity = cosine_similarity(ratings)
+
+def recommend(user_index, top_n=2):
+    similarity_scores = user_similarity[user_index]
+    weighted_ratings = np.dot(similarity_scores, ratings)
+    
+    user_ratings = ratings[user_index]
+    recommendations = []
+
+    for i in range(len(items)):
+        if user_ratings[i] == 0:
+            recommendations.append((items[i], weighted_ratings[i]))
+
+    recommendations.sort(key=lambda x: x[1], reverse=True)
+    return recommendations[:top_n]
+
+user_id = 0
+recs = recommend(user_id)
+
+print("Recommendations for", users[user_id])
+for item, score in recs:
+    print(item, "with score", round(score, 2))
